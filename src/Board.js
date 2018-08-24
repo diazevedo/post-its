@@ -16,9 +16,19 @@ class Board extends Component {
         this.remove = this.remove.bind(this)
         this.nextId = this.nextId.bind(this)
     }
+
+    componentWillMount() {
+        var self = this
+        if(this.props.count) {
+            fetch(`https://baconipsum.com/api/?type=all-meat&sentences=${this.props.count}`)
+            .then(response => response.json())
+            .then(json => json[0]
+                          .split('. ')
+                          .forEach(sentence => self.add(sentence.substring(0, 25))))
+        }
+    }
    
     update(newText, i) {
-        console.log('updating an item at index ', i, newText)
         this.setState(prevState => ({
             notes: prevState.notes.map(
                 note => (note.id !== i) ? note : {...note, note: newText}
@@ -50,10 +60,10 @@ class Board extends Component {
         }))
     }
 
-    eachNote(note, i) {
+    eachNote(note) {
         return (
-            <Note key={i}
-                  index={i}
+            <Note key={note.id}
+                  index={note.id}
                   onChange={this.update}
                   onRemove={this.remove}>
                   {note.note}
